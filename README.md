@@ -29,7 +29,7 @@ This project is divided into two main components:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/HashProbe.git
+   git clone https://github.com/Skywalks567/HashProbe.git
    cd HashProbe
    ```
 
@@ -52,4 +52,4 @@ This tool is for **educational and authorized security testing purposes only**. 
 
 ---
 
-Developed with ❤️ by [Raymond Frans Dodi Situmorang](https://github.com/yourusername)
+Developed by [Raymond Frans Dodi Situmorang](https://github.com/Skywalks567)
