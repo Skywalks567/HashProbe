@@ -41,8 +41,20 @@ This project is divided into two main components:
 
 3. **Run HashProbe:**
    ```bash
-   hashprobe -H <your-hash-here>
+   # Test with the included small wordlist
+   hashprobe -H 5f4dcc3b5aa765d61d8327deb882cf99 -b cli/src/hashprobe/wordlists/test.txt
    ```
+
+---
+
+## 📚 Wordlists
+
+For performance and security reasons, large wordlists like `rockyou.txt` are **not included** in this repository.
+
+- **`test.txt`**: A small wordlist included for testing the installation.
+- **`rockyou.txt`**: You can download the standard RockYou wordlist from [Kaggle](https://www.kaggle.com/datasets/wjburns/common-password-list-rockyoutxt) or [GitHub](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt).
+  
+Place your downloaded wordlists in `cli/src/hashprobe/wordlists/` to use them with the default paths.
 
 ---
 

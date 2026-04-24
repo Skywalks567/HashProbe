@@ -13,7 +13,6 @@ dist/
 cli/src/hashprobe/wordlists/additional.txt
 cli/src/hashprobe/wordlists/rockyou.txt
 cli/src/hashprobe/wordlists/rockyou.txt.gz
-cli/src/hashprobe/wordlists/test.txt
 
 # Web
 node_modules/
