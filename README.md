@@ -52,8 +52,11 @@ This project is divided into two main components:
 For performance and security reasons, large wordlists like `rockyou.txt` are **not included** in this repository.
 
 - **`test.txt`**: A small wordlist included for testing the installation.
-- **`rockyou.txt`**: You can download the standard RockYou wordlist from [Kaggle](https://www.kaggle.com/datasets/wjburns/common-password-list-rockyoutxt) or [GitHub](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt).
+- **`rockyou.txt` / `rockyou.txt.gz`**: You can download the standard RockYou wordlist (plain or compressed) from [Kaggle](https://www.kaggle.com/datasets/wjburns/common-password-list-rockyoutxt) or [GitHub](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt).
   
+> [!TIP]
+> HashProbe supports **compressed wordlists (`.gz`)** natively. Using `rockyou.txt.gz` saves disk space and is recommended.
+
 Place your downloaded wordlists in `cli/src/hashprobe/wordlists/` to use them with the default paths.
 
 ---

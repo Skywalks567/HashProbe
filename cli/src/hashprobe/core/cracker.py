@@ -1,4 +1,5 @@
 import concurrent.futures
+import gzip
 from pathlib import Path
 from .hashes import HASH_FUNCTIONS
 
@@ -47,7 +48,12 @@ def crack_hash(
         if not wordlist.exists():
             raise FileNotFoundError(f"Wordlist not found: {wordlist}")
 
-        with open(wordlist, "r", encoding="latin-1", errors="ignore") as f:
+        # Choose open function based on extension
+        is_gz = wordlist.suffix == ".gz"
+        open_func = gzip.open if is_gz else open
+        mode = "rt" if is_gz else "r"
+
+        with open_func(wordlist, mode, encoding="latin-1", errors="ignore") as f:
             if threads <= 1:
                 # Sequential mode
                 for line in f:
@@ -91,7 +97,6 @@ def crack_hash(
                         for future in concurrent.futures.as_completed(futures):
                             found = future.result()
                             if found:
-                                # Found it! (attempts count is approximate here)
                                 return {
                                     "found": True,
                                     "password": found,

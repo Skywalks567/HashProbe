@@ -7,7 +7,11 @@ from .core.wordlist import generate_smart_wordlist, ADDITIONAL_FILE
 
 # Path relative to this file
 BASE_DIR = Path(__file__).parent
-DEFAULT_ROCKYOU = BASE_DIR / "wordlists" / "rockyou.txt"
+ROCKYOU_GZ = BASE_DIR / "wordlists" / "rockyou.txt.gz"
+ROCKYOU_TXT = BASE_DIR / "wordlists" / "rockyou.txt"
+
+# Default to .gz if it exists, otherwise .txt
+DEFAULT_ROCKYOU = ROCKYOU_GZ if ROCKYOU_GZ.exists() else ROCKYOU_TXT
 
 def parse_args():
     parser = argparse.ArgumentParser(
