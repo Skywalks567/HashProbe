@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.venv
+build/
+dist/
+*.egg-info/
+
+# Project Specific
+cli/src/hashprobe/wordlists/additional.txt
+cli/src/hashprobe/wordlists/rockyou.txt
+cli/src/hashprobe/wordlists/rockyou.txt.gz
+cli/src/hashprobe/wordlists/test.txt
+
+# Web
+node_modules/
+.next/
+out/
+.DS_Store

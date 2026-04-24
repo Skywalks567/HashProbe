@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hashprobe"
+version = "0.1"
+description = "Hash analysis and dictionary-based testing tool"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    { name = "Raymond Frans Dodi Situmorang" }
+]
+
+dependencies = [
+    "pycryptodome",
+]
+
+keywords = ["hash", "cybersecurity", "forensics", "pentest"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "Environment :: Console"
+]
+
+[project.scripts]
+hashprobe = "hashprobe.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
