@@ -33,17 +33,35 @@ This project is divided into two main components:
    cd HashProbe
    ```
 
-2. **Setup CLI:**
+2. **Create and activate a Virtual Environment (Recommended):**
    ```bash
-   cd cli
-   pip install .
+   # Create venv
+   python -m venv venv
+
+   # Activate (Windows)
+   .\venv\Scripts\activate
+
+   # Activate (Linux/macOS)
+   source venv/bin/activate
    ```
 
-3. **Run HashProbe:**
+3. **Install the CLI package:**
    ```bash
-   # Test with the included small wordlist
-   hashprobe -H 5f4dcc3b5aa765d61d8327deb882cf99 -b cli/src/hashprobe/wordlists/test.txt
+   # Install in editable mode from the root directory
+   pip install -e ./cli
    ```
+
+### Usage
+
+Once installed, you can run `hashprobe` from anywhere in your terminal as long as the virtual environment is active.
+
+```bash
+# Analyze a hash and test against a wordlist
+hashprobe -H 5f4dcc3b5aa765d61d8327deb882cf99 -b cli/src/hashprobe/wordlists/test.txt
+
+# See all options
+hashprobe --help
+```
 
 ---
 

@@ -11,11 +11,20 @@ The command-line interface for HashProbe. This is the core engine used for high-
 
 ## 🚀 Installation
 
-Ensure you have Python 3.9+ installed.
+Ensure you have Python 3.9+ installed. It is highly recommended to use a virtual environment.
 
 ```bash
-# From the cli directory
-pip install .
+# 1. Create a virtual environment
+python -m venv venv
+
+# 2. Activate (Windows)
+.\venv\Scripts\activate
+
+# 2. Activate (Linux/macOS)
+source venv/bin/activate
+
+# 3. Install the package in editable mode
+pip install -e .
 ```
 
 ## 📖 Usage
