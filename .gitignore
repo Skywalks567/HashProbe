@@ -1,21 +1,23 @@
-# Python
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Python Build & Distribution
 __pycache__/
 *.py[cod]
 *$py.class
-venv/
-.env
-.venv
 build/
 dist/
 *.egg-info/
+.eggs/
 
-# Project Specific
-cli/src/hashprobe/wordlists/additional.txt
-cli/src/hashprobe/wordlists/rockyou.txt
-cli/src/hashprobe/wordlists/rockyou.txt.gz
-
-# Web
-node_modules/
-.next/
-out/
-.DS_Store
+# Env Files
+.env
+.env.local
+.env.*.local
