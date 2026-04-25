@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Shield, Zap, Info, Terminal, Lock, ChevronRight, Activity } from "lucide-react";
+import { Search, Shield, Zap, Info, Terminal, Lock, ChevronRight, Activity, User, BrainCircuit } from "lucide-react";
 
 export default function Home() {
   const [hash, setHash] = useState("");
@@ -9,6 +9,15 @@ export default function Home() {
   const [results, setResults] = useState<any[] | null>(null);
   const [crackingIdx, setCrackingIdx] = useState<number | null>(null);
   const [crackResult, setCrackResult] = useState<{ [key: number]: any }>({});
+  
+  // Smart Crack States
+  const [showSmartForm, setShowSmartForm] = useState<number | null>(null);
+  const [smartData, setSmartData] = useState({
+    name: "",
+    nickname: "",
+    birth: "",
+    extra: ""
+  });
 
   const handleAnalyze = async () => {
     if (!hash) return;
@@ -16,6 +25,7 @@ export default function Home() {
     setResults(null);
     setCrackResult({});
     setCrackingIdx(null);
+    setShowSmartForm(null);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -65,6 +75,39 @@ export default function Home() {
     } catch (error: any) {
       console.error("Crack error:", error);
       alert(`Cracking failed: ${error.message}`);
+    } finally {
+      setCrackingIdx(null);
+    }
+  };
+
+  const handleSmartCrack = async (index: number, hashType: string) => {
+    setCrackingIdx(index);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/smart-crack`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          hash_value: hash,
+          hash_type: hashType,
+          ...smartData,
+          threads: 4
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Smart cracking failed");
+      }
+
+      const data = await response.json();
+      setCrackResult(prev => ({ ...prev, [index]: data }));
+      setShowSmartForm(null);
+    } catch (error: any) {
+      console.error("Smart crack error:", error);
+      alert(`Smart cracking failed: ${error.message}`);
     } finally {
       setCrackingIdx(null);
     }
@@ -177,22 +220,90 @@ export default function Home() {
                         
                         <div className="flex items-center gap-3">
                           {res.type !== "Base64 Encoded" && (
-                            <button
-                              onClick={() => handleCrack(idx, res.type)}
-                              disabled={crackingIdx !== null}
-                              className="px-4 py-2 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-2"
-                            >
-                              {crackingIdx === idx ? (
-                                <Activity className="w-3 h-3 animate-spin" />
-                              ) : (
-                                <Lock className="w-3 h-3" />
-                              )}
-                              {crackingIdx === idx ? "Cracking..." : "Crack Hash"}
-                            </button>
+                            <>
+                              <button
+                                onClick={() => setShowSmartForm(showSmartForm === idx ? null : idx)}
+                                className="p-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 rounded-lg transition-all"
+                                title="Smart Crack"
+                              >
+                                <BrainCircuit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleCrack(idx, res.type)}
+                                disabled={crackingIdx !== null}
+                                className="px-4 py-2 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-2"
+                              >
+                                {crackingIdx === idx ? (
+                                  <Activity className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  <Lock className="w-3 h-3" />
+                                )}
+                                {crackingIdx === idx ? "Cracking..." : "Crack"}
+                              </button>
+                            </>
                           )}
-                          <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-400 transition-all" />
                         </div>
                       </div>
+
+                      {/* Smart Crack Form */}
+                      {showSmartForm === idx && (
+                        <div className="ml-12 p-5 glass border-purple-500/20 animate-in zoom-in-95 duration-200">
+                          <div className="flex items-center gap-2 mb-4 text-purple-400">
+                            <BrainCircuit className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-wider">Personalized Target Info</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="space-y-1">
+                              <label className="text-[10px] text-gray-500 uppercase font-bold px-1">Full Name</label>
+                              <input 
+                                type="text" 
+                                className="w-full bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-sm focus:border-purple-500/50 outline-none"
+                                placeholder="Target's Name"
+                                value={smartData.name}
+                                onChange={(e) => setSmartData({...smartData, name: e.target.value})}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[10px] text-gray-500 uppercase font-bold px-1">Nickname</label>
+                              <input 
+                                type="text" 
+                                className="w-full bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-sm focus:border-purple-500/50 outline-none"
+                                placeholder="Target's Nick"
+                                value={smartData.nickname}
+                                onChange={(e) => setSmartData({...smartData, nickname: e.target.value})}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[10px] text-gray-500 uppercase font-bold px-1">Birth Date/Year</label>
+                              <input 
+                                type="text" 
+                                className="w-full bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-sm focus:border-purple-500/50 outline-none"
+                                placeholder="e.g. 1995 or 12/05"
+                                value={smartData.birth}
+                                onChange={(e) => setSmartData({...smartData, birth: e.target.value})}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[10px] text-gray-500 uppercase font-bold px-1">Extra Keywords</label>
+                              <input 
+                                type="text" 
+                                className="w-full bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-sm focus:border-purple-500/50 outline-none"
+                                placeholder="pet, hobby, city..."
+                                value={smartData.extra}
+                                onChange={(e) => setSmartData({...smartData, extra: e.target.value})}
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => handleSmartCrack(idx, res.type)}
+                            disabled={crackingIdx !== null}
+                            className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
+                          >
+                            {crackingIdx === idx ? <Activity className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+                            Start Smart Crack
+                          </button>
+                        </div>
+                      )}
 
                       {/* Crack Result Area */}
                       {crackResult[idx] && (

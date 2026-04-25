@@ -29,6 +29,7 @@ The dashboard will be available at `http://localhost:3000`.
 ## 🛠 Features
 
 - **Hash Identification**: Automatically identifies hash types using the core engine.
+- **Smart Cracking**: Personalized password testing based on target-specific information.
 - **Premium UI**: Sleek dark-mode dashboard with glassmorphism and real-time animations.
 - **Real-time Feedback**: Instant detection results with confidence scores.
 

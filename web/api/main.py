@@ -14,6 +14,7 @@ sys.path.append(cli_src)
 
 from hashprobe.core.detector import detect_hash
 from hashprobe.core.cracker import crack_hash
+from hashprobe.core.wordlist import create_smart_wordlist_data
 from pathlib import Path
 
 # Setup default wordlist path relative to CLI structure
@@ -40,6 +41,15 @@ class CrackRequest(BaseModel):
     hash_value: str
     hash_type: str
     wordlist: Optional[str] = None
+    threads: Optional[int] = 4
+
+class SmartCrackRequest(BaseModel):
+    hash_value: str
+    hash_type: str
+    name: Optional[str] = ""
+    nickname: Optional[str] = ""
+    birth: Optional[str] = ""
+    extra: Optional[str] = ""
     threads: Optional[int] = 4
 
 @app.get("/")
@@ -70,6 +80,32 @@ async def api_crack_hash(request: CrackRequest):
         return result
     except Exception as e:
         print(f"Crack Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/smart-crack")
+async def api_smart_crack(request: SmartCrackRequest):
+    try:
+        # 1. Generate smart words
+        smart_words = create_smart_wordlist_data(
+            name=request.name,
+            nickname=request.nickname,
+            birth=request.birth,
+            extra=request.extra
+        )
+        
+        print(f"Smart Cracking {request.hash_value} with {len(smart_words)} generated words")
+
+        # 2. Crack using both smart words and default wordlist
+        result = crack_hash(
+            target_hash=request.hash_value,
+            hash_type=request.hash_type,
+            wordlist_path=str(DEFAULT_ROCKYOU),
+            additional_words=smart_words,
+            threads=request.threads or 4
+        )
+        return result
+    except Exception as e:
+        print(f"Smart Crack Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

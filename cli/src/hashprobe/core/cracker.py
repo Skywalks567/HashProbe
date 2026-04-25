@@ -15,6 +15,7 @@ def crack_hash(
     wordlist_path: str,
     limit: int | None = None,
     additional_file: str | None = None,
+    additional_words: list[str] | None = None,
     threads: int = 1
 ):
     if hash_type not in HASH_FUNCTIONS:
@@ -29,7 +30,19 @@ def crack_hash(
     wordlist = Path(wordlist_path).expanduser().resolve() if wordlist_path else None
     additional = Path(additional_file).expanduser().resolve() if additional_file else None
 
-    # 1. TRY ADDITIONAL FILE FIRST
+    # 1. TRY ADDITIONAL WORDS (Direct list) FIRST
+    if additional_words:
+        found = _check_words(additional_words, hash_func, target_hash)
+        if found:
+            return {
+                "found": True,
+                "password": found,
+                "attempts": len(additional_words),
+                "source": "smart-generator"
+            }
+        attempts += len(additional_words)
+
+    # 2. TRY ADDITIONAL FILE
     if additional and additional.exists():
         with open(additional, "r", encoding="utf-8", errors="ignore") as f:
             words = [line.strip() for line in f if line.strip()]

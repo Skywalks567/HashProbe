@@ -9,7 +9,7 @@ HashProbe is a powerful, modern hash analysis and dictionary-based testing tool 
 This project is divided into two main components:
 
 - **[CLI Version](./cli/)**: The core engine of HashProbe. A powerful terminal-based tool for fast hash detection and multi-threaded cracking.
-- **[Web Version](./web/)**: A user-friendly web interface for those who prefer a visual dashboard. (Currently under development).
+- **[Web Version](./web/)**: A user-friendly web interface with a premium dashboard for real-time analysis and smart cracking.
 
 ---
 
@@ -17,9 +17,9 @@ This project is divided into two main components:
 
 - **🚀 Auto-Detection**: Intelligent scoring system to identify MD5, SHA1, SHA256, NTLM, and more.
 - **⚡ Fast Cracking**: Multi-threaded dictionary attack support.
-- **🧠 Smart Wordlist**: Built-in generator to create personalized wordlists based on target information.
+- **🧠 Smart Wordlist**: Built-in generator to create personalized wordlists based on target information (Name, Birthday, etc.).
 - **🧩 Base64 Decoding**: Automatic detection and preview of Base64 encoded strings.
-- **📊 Detailed Stats**: View attempts, speed, and confidence levels for each analysis.
+- **🌐 Web Dashboard**: Premium, modern interface for a seamless analysis experience.
 
 ---
 
