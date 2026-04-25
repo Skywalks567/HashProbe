@@ -13,6 +13,14 @@ cli_src = os.path.join(project_root, "cli/src")
 sys.path.append(cli_src)
 
 from hashprobe.core.detector import detect_hash
+from hashprobe.core.cracker import crack_hash
+from pathlib import Path
+
+# Setup default wordlist path relative to CLI structure
+BASE_DIR = Path(cli_src) / "hashprobe"
+ROCKYOU_GZ = BASE_DIR / "wordlists" / "rockyou.txt.gz"
+ROCKYOU_TXT = BASE_DIR / "wordlists" / "rockyou.txt"
+DEFAULT_ROCKYOU = ROCKYOU_GZ if ROCKYOU_GZ.exists() else ROCKYOU_TXT
 
 app = FastAPI(title="HashProbe API")
 
@@ -28,6 +36,12 @@ app.add_middleware(
 class HashRequest(BaseModel):
     hash_value: str
 
+class CrackRequest(BaseModel):
+    hash_value: str
+    hash_type: str
+    wordlist: Optional[str] = None
+    threads: Optional[int] = 4
+
 @app.get("/")
 async def root():
     return {"status": "online", "message": "HashProbe API is running"}
@@ -38,6 +52,24 @@ async def api_detect_hash(request: HashRequest):
         results = detect_hash(request.hash_value)
         return {"hash": request.hash_value, "results": results}
     except Exception as e:
+        print(f"Detect Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/crack")
+async def api_crack_hash(request: CrackRequest):
+    try:
+        wordlist_path = request.wordlist or str(DEFAULT_ROCKYOU)
+        print(f"Cracking {request.hash_value} ({request.hash_type}) using {wordlist_path}")
+        
+        result = crack_hash(
+            target_hash=request.hash_value,
+            hash_type=request.hash_type,
+            wordlist_path=wordlist_path,
+            threads=request.threads or 4
+        )
+        return result
+    except Exception as e:
+        print(f"Crack Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

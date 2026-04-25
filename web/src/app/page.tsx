@@ -7,11 +7,15 @@ export default function Home() {
   const [hash, setHash] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<any[] | null>(null);
+  const [crackingIdx, setCrackingIdx] = useState<number | null>(null);
+  const [crackResult, setCrackResult] = useState<{ [key: number]: any }>({});
 
   const handleAnalyze = async () => {
     if (!hash) return;
     setIsAnalyzing(true);
     setResults(null);
+    setCrackResult({});
+    setCrackingIdx(null);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -32,6 +36,37 @@ export default function Home() {
       alert("Error connecting to backend API. Make sure the Python server is running.");
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleCrack = async (index: number, hashType: string) => {
+    setCrackingIdx(index);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/crack`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          hash_value: hash,
+          hash_type: hashType,
+          threads: 4
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Cracking failed");
+      }
+
+      const data = await response.json();
+      setCrackResult(prev => ({ ...prev, [index]: data }));
+    } catch (error: any) {
+      console.error("Crack error:", error);
+      alert(`Cracking failed: ${error.message}`);
+    } finally {
+      setCrackingIdx(null);
     }
   };
 
@@ -107,7 +142,7 @@ export default function Home() {
                   <Zap className="w-4 h-4 text-yellow-500" /> Detection Results
                 </h3>
                 {results && (
-                  <span className="text-xs text-gray-500">3 types found</span>
+                  <span className="text-xs text-gray-500">{results.length} types found</span>
                 )}
               </div>
 
@@ -126,32 +161,63 @@ export default function Home() {
               )}
 
               {results && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {results.map((res, idx) => (
-                    <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/10 transition-all cursor-default group">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold">
-                          {res.type[0]}
-                        </div>
-                        <div>
-                          <div className="font-bold">{res.type}</div>
-                          <div className="text-xs text-gray-500">Confidence Score</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <div className="text-lg font-mono font-bold text-blue-400">
-                            {(res.confidence * 100).toFixed(0)}%
+                    <div key={idx} className="space-y-2">
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/10 transition-all cursor-default group">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold">
+                            {res.type[0]}
                           </div>
-                          <div className="w-24 h-1 bg-gray-800 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-blue-500 transition-all duration-1000"
-                              style={{ width: `${res.confidence * 100}%` }}
-                            />
+                          <div>
+                            <div className="font-bold">{res.type}</div>
+                            <div className="text-xs text-gray-500">Confidence Score: {(res.confidence * 100).toFixed(0)}%</div>
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-400 transition-all" />
+                        
+                        <div className="flex items-center gap-3">
+                          {res.type !== "Base64 Encoded" && (
+                            <button
+                              onClick={() => handleCrack(idx, res.type)}
+                              disabled={crackingIdx !== null}
+                              className="px-4 py-2 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-2"
+                            >
+                              {crackingIdx === idx ? (
+                                <Activity className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Lock className="w-3 h-3" />
+                              )}
+                              {crackingIdx === idx ? "Cracking..." : "Crack Hash"}
+                            </button>
+                          )}
+                          <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-400 transition-all" />
+                        </div>
                       </div>
+
+                      {/* Crack Result Area */}
+                      {crackResult[idx] && (
+                        <div className={`ml-12 p-4 rounded-xl border animate-in slide-in-from-top-2 duration-300 ${crackResult[idx].found ? 'bg-green-500/5 border-green-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+                          {crackResult[idx].found ? (
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 bg-green-500/20 rounded-lg mt-1">
+                                <Shield className="w-4 h-4 text-green-500" />
+                              </div>
+                              <div>
+                                <div className="text-sm font-bold text-green-500 uppercase tracking-wider">Success! Password Found</div>
+                                <div className="text-xl font-mono font-bold mt-1 text-white">{crackResult[idx].password}</div>
+                                <div className="text-xs text-gray-500 mt-2">
+                                  Tested {crackResult[idx].attempts.toLocaleString()} words from {crackResult[idx].source}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-sm text-red-400 flex items-center gap-2">
+                              <Info className="w-4 h-4" />
+                              Password not found in wordlist ({crackResult[idx].attempts.toLocaleString()} attempts)
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
